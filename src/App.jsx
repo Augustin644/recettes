@@ -180,3 +180,4 @@ export function fileToBase64(file) {
     reader.readAsDataURL(file);
   });
 }
+export default App;
