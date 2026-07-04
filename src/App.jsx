@@ -26,4 +26,5 @@ function SettingsModal({ onClose }) {
       </div>
     </div>
   );
+  export default App;
 }
