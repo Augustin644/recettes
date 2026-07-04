@@ -1,10 +1,10 @@
-// ── IA (Google Gemini API) ──────────────────────────────────────────────────
-// Appel DIRECT depuis le navigateur avec ta propre clé API Google AI Studio.
+// ── IA (Gemini API) ──────────────────────────────────────────────────────────
+// Appel DIRECT depuis le navigateur avec ta propre clé API Google Gemini.
 // La clé est stockée uniquement dans le localStorage de TON navigateur.
 
 const MODEL = "gemini-2.5-flash";
-const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`;
-const STORAGE_KEY = "carnet_gemini_api_key";
+const API_URL = "https://generativelanguage.googleapis.com/v1beta/models";
+const STORAGE_KEY = "carnet_gemini_api_key"; // Clé modifiée pour correspondre au nouveau service
 
 export function getApiKey() {
   return localStorage.getItem(STORAGE_KEY) || "";
@@ -44,9 +44,11 @@ async function callGemini(contents) {
     throw err;
   }
 
+  const url = `${API_URL}/${MODEL}:generateContent?key=${apiKey}`;
+
   let res;
   try {
-    res = await fetch(`${API_URL}?key=${apiKey}`, {
+    res = await fetch(url, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -56,6 +58,9 @@ async function callGemini(contents) {
         generationConfig: {
           responseMimeType: "application/json",
         },
+        systemInstruction: {
+          parts: [{ text: SCHEMA_INSTRUCTIONS }]
+        }
       }),
     });
   } catch {
@@ -68,17 +73,17 @@ async function callGemini(contents) {
     let detail = "";
     try { detail = (await res.json())?.error?.message || ""; } catch {}
     const err = new Error(
-      res.status === 400 && detail.includes("API key")
+      res.status === 400 || res.status === 403
         ? "Clé API invalide ou refusée."
         : `Erreur API Gemini (${res.status}) ${detail}`
     );
-    err.code = res.status === 400 ? "BAD_KEY" : "API_ERROR";
+    err.code = (res.status === 400 || res.status === 403) ? "BAD_KEY" : "API_ERROR";
     throw err;
   }
 
   const data = await res.json();
-  const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
-  const clean = text.trim();
+  const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
+  const clean = text.replace(/```json|```/g, "").trim();
 
   try {
     return JSON.parse(clean);
@@ -90,23 +95,11 @@ async function callGemini(contents) {
 }
 
 export async function extractRecipeFromText(text) {
-  return callGemini([
-    {
-      parts: [
-        { text: `${SCHEMA_INSTRUCTIONS}\n\nVoici le texte brut d'une recette à structurer :\n\n${text}` }
-      ]
-    }
-  ]);
+  return callGemini([{ parts: [{ text: `Voici le texte brut d'une recette à structurer :\n\n${text}` }] }]);
 }
 
 export async function generateRecipe(idea) {
-  return callGemini([
-    {
-      parts: [
-        { text: `${SCHEMA_INSTRUCTIONS}\n\nInvente une recette originale et réaliste correspondant à cette demande : "${idea}"` }
-      ]
-    }
-  ]);
+  return callGemini([{ parts: [{ text: `Invente une recette originale et réaliste correspondant à cette demande : "${idea}"` }] }]);
 }
 
 export async function extractRecipeFromImage(base64, mediaType) {
@@ -114,13 +107,12 @@ export async function extractRecipeFromImage(base64, mediaType) {
     {
       parts: [
         { inlineData: { mimeType: mediaType, data: base64 } },
-        { text: `${SCHEMA_INSTRUCTIONS}\n\nCette image est une capture d'écran (Instagram, un site, une photo de livre de cuisine...) contenant une recette. Lis attentivement les ingrédients, les quantités et les étapes visibles, puis structure-les.` }
+        { text: "Cette image est une capture d'écran (Instagram, un site, une photo de livre de cuisine...) contenant une recette. Lis attentivement les ingrédients, les quantités et les étapes visibles, puis structure-les." }
       ]
     }
   ]);
 }
 
-// Convertit un File en {base64, mediaType} pour l'envoi à l'API vision.
 export function fileToBase64(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
