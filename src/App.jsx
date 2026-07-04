@@ -1,50 +1,50 @@
 import { useState } from "react";
-import {
-  generateRecipe
-} from "./services/gemini";
+
+const MODEL = "gemini-2.5-flash";
+const STORAGE_KEY = "carnet_gemini_api_key";
+
+function getApiKey() {
+  return localStorage.getItem(STORAGE_KEY) || "";
+}
+
+async function callGemini(prompt) {
+  const apiKey = getApiKey();
+  if (!apiKey) throw new Error("No API key");
+
+  const res = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${apiKey}`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }]
+      })
+    }
+  );
+
+  const data = await res.json();
+
+  return data.candidates?.[0]?.content?.parts?.[0]?.text || "Erreur IA";
+}
 
 export default function App() {
-  const [idea, setIdea] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState(null);
+  const [text, setText] = useState("");
+  const [out, setOut] = useState("");
 
-  const handleGenerate = async () => {
-    if (!idea) return;
-
-    setLoading(true);
-    setResult(null);
-
-    try {
-      const res = await generateRecipe(idea);
-      setResult(res);
-    } catch (err) {
-      console.error(err);
-      alert("Erreur IA");
-    }
-
-    setLoading(false);
+  const test = async () => {
+    const res = await callGemini("Donne une recette de crêpes");
+    setOut(res);
   };
 
   return (
-    <div style={{ padding: 20, fontFamily: "Arial" }}>
-      <h1>🍳 Recettes IA</h1>
+    <div style={{ padding: 20 }}>
+      <h1>Recettes IA</h1>
 
-      <input
-        value={idea}
-        onChange={(e) => setIdea(e.target.value)}
-        placeholder="Ex: pizza, burger, dessert..."
-        style={{ padding: 10, width: "300px" }}
-      />
-
-      <button onClick={handleGenerate} disabled={loading}>
-        {loading ? "Génération..." : "Créer recette"}
+      <button onClick={test}>
+        Tester IA
       </button>
 
-      {result && (
-        <pre style={{ marginTop: 20 }}>
-          {JSON.stringify(result, null, 2)}
-        </pre>
-      )}
+      <pre>{out}</pre>
     </div>
   );
 }
