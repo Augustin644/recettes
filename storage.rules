@@ -1,0 +1,10 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /photos/{photoId} {
+      allow read, write: if request.auth != null
+        && request.resource.size < 8 * 1024 * 1024   // max 8 Mo par photo
+        && request.resource.contentType.matches('image/.*');
+    }
+  }
+}
