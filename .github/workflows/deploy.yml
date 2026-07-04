@@ -25,7 +25,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22 # Mis à jour vers Node 22 (LTS stable) pour éviter les warnings
           cache: npm
 
       - name: Install dependencies
@@ -41,6 +41,7 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           path: dist
+          overwrite: true # Évite le bug des "Multiple artifacts" si tu dois re-run le job
 
       - name: Deploy to GitHub Pages
         id: deployment
