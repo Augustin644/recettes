@@ -1,14 +1,10 @@
-// ── IA (Claude API) ──────────────────────────────────────────────────────────
-// Appel DIRECT depuis le navigateur avec ta propre clé API Anthropic.
-// C'est la seule option simple sans backend pour une app statique (GitHub
-// Pages). La clé est stockée uniquement dans le localStorage de TON navigateur
-// (jamais commitée dans le repo, jamais dans le build). Garde-la pour toi et
-// ne partage pas l'URL de ton app publiquement avec la clé déjà enregistrée
-// sur la machine de quelqu'un d'autre.
+// ── IA (Google Gemini API) ──────────────────────────────────────────────────
+// Appel DIRECT depuis le navigateur avec ta propre clé API Google AI Studio.
+// La clé est stockée uniquement dans le localStorage de TON navigateur.
 
-const MODEL = "claude-sonnet-5";
-const API_URL = "https://api.anthropic.com/v1/messages";
-const STORAGE_KEY = "carnet_anthropic_api_key";
+const MODEL = "gemini-2.5-flash";
+const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`;
+const STORAGE_KEY = "carnet_gemini_api_key";
 
 export function getApiKey() {
   return localStorage.getItem(STORAGE_KEY) || "";
@@ -40,33 +36,30 @@ Règles importantes :
 - Sois précis et réaliste sur les quantités et temps, quitte à estimer raisonnablement si l'info manque.
 - Le texte doit être en français.`;
 
-async function callClaude(userContent) {
+async function callGemini(contents) {
   const apiKey = getApiKey();
   if (!apiKey) {
-    const err = new Error("Aucune clé API Anthropic enregistrée.");
+    const err = new Error("Aucune clé API Gemini enregistrée.");
     err.code = "NO_API_KEY";
     throw err;
   }
 
   let res;
   try {
-    res = await fetch(API_URL, {
+    res = await fetch(`${API_URL}?key=${apiKey}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "x-api-key": apiKey,
-        "anthropic-version": "2023-06-01",
-        "anthropic-dangerous-direct-browser-access": "true",
       },
       body: JSON.stringify({
-        model: MODEL,
-        max_tokens: 2000,
-        system: SCHEMA_INSTRUCTIONS,
-        messages: [{ role: "user", content: userContent }],
+        contents: contents,
+        generationConfig: {
+          responseMimeType: "application/json",
+        },
       }),
     });
   } catch {
-    const err = new Error("Impossible de contacter l'API Anthropic (réseau).");
+    const err = new Error("Impossible de contacter l'API Gemini (réseau).");
     err.code = "NETWORK";
     throw err;
   }
@@ -75,20 +68,17 @@ async function callClaude(userContent) {
     let detail = "";
     try { detail = (await res.json())?.error?.message || ""; } catch {}
     const err = new Error(
-      res.status === 401
+      res.status === 400 && detail.includes("API key")
         ? "Clé API invalide ou refusée."
-        : `Erreur API Anthropic (${res.status}) ${detail}`
+        : `Erreur API Gemini (${res.status}) ${detail}`
     );
-    err.code = res.status === 401 ? "BAD_KEY" : "API_ERROR";
+    err.code = res.status === 400 ? "BAD_KEY" : "API_ERROR";
     throw err;
   }
 
   const data = await res.json();
-  const text = (data.content || [])
-    .filter((b) => b.type === "text")
-    .map((b) => b.text)
-    .join("");
-  const clean = text.replace(/```json|```/g, "").trim();
+  const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
+  const clean = text.trim();
 
   try {
     return JSON.parse(clean);
@@ -100,20 +90,33 @@ async function callClaude(userContent) {
 }
 
 export async function extractRecipeFromText(text) {
-  return callClaude(`Voici le texte brut d'une recette à structurer :\n\n${text}`);
+  return callGemini([
+    {
+      parts: [
+        { text: `${SCHEMA_INSTRUCTIONS}\n\nVoici le texte brut d'une recette à structurer :\n\n${text}` }
+      ]
+    }
+  ]);
 }
 
 export async function generateRecipe(idea) {
-  return callClaude(`Invente une recette originale et réaliste correspondant à cette demande : "${idea}"`);
+  return callGemini([
+    {
+      parts: [
+        { text: `${SCHEMA_INSTRUCTIONS}\n\nInvente une recette originale et réaliste correspondant à cette demande : "${idea}"` }
+      ]
+    }
+  ]);
 }
 
 export async function extractRecipeFromImage(base64, mediaType) {
-  return callClaude([
-    { type: "image", source: { type: "base64", media_type: mediaType, data: base64 } },
+  return callGemini([
     {
-      type: "text",
-      text: "Cette image est une capture d'écran (Instagram, un site, une photo de livre de cuisine...) contenant une recette. Lis attentivement les ingrédients, les quantités et les étapes visibles, puis structure-les.",
-    },
+      parts: [
+        { inlineData: { mimeType: mediaType, data: base64 } },
+        { text: `${SCHEMA_INSTRUCTIONS}\n\nCette image est une capture d'écran (Instagram, un site, une photo de livre de cuisine...) contenant une recette. Lis attentivement les ingrédients, les quantités et les étapes visibles, puis structure-les.` }
+      ]
+    }
   ]);
 }
 
