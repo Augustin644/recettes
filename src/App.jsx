@@ -1,17 +1,26 @@
 import React, { useState, useEffect, useRef } from 'react';
 
-// ── 1. PALETTES DE COULEURS ACCORDÉES (CONTRASTE 25% AFFIRMÉ) ────────────────
+// ── 1. TOUTES TES DONNÉES ET FONCTIONNALITÉS COMPLÈTES ───────────────────────
+// (Remplace ces listes d'exemples par tes vrais states ou appels API si nécessaire)
+const INITIAL_RECIPES = [
+  { id: 1, title: "Tarte Tatin aux coings et romarin", duration: "45 min", level: "Moyen", category: "mine", isFavorite: false },
+  { id: 2, title: "Brioche tressée à la fleur d'oranger", duration: "1h 30", level: "Avancé", category: "mine", isFavorite: true },
+  { id: 3, title: "Velouté de potimarron aux éclats de châtaigne", duration: "30 min", level: "Facile", category: "public", isFavorite: false },
+  { id: 4, title: "Risotto d'épeautre aux champignons", duration: "40 min", level: "Moyen", category: "public", isFavorite: true },
+];
+
+// ── 2. LES 3 PALETTES ACCORDÉES (CONTRASTE 25% AFFIRMÉ) ──────────────────────
 const THEMES = {
   mine: {
     "--bg-main": "#EFECE6",          // Sable chaud
-    "--bg-card": "#FFFFFF",          // Blanc pur
+    "--bg-card": "#FFFFFF",          // Blanc pur tranché
     "--bg-header": "rgba(239, 236, 230, 0.85)",
-    "--bg-nav": "#DFD9CE",           // Bouton inactif
+    "--bg-nav": "#DFD9CE",
     "--text-main": "#1F1A17",        // Café noir
     "--text-muted": "#6E655F",       // Écorce
     "--accent": "#C85329",           // Terre cuite
-    "--accent-light": "#FBEBE3",     // Crème de pêche
-    "--border": "#D5CEBF",           // Trait croquis
+    "--accent-light": "#FBEBE3",
+    "--border": "#D5CEBF",           // Trait croquis net
     "--shadow": "0 6px 20px rgba(31, 26, 23, 0.05)",
   },
   public: {
@@ -21,7 +30,7 @@ const THEMES = {
     "--bg-nav": "#CDDAD0",
     "--text-main": "#0F1812",        // Vert forêt profond
     "--text-muted": "#526357",       // Feuille de laurier
-    "--accent": "#2E623E",           // Vert pin noble
+    "--accent": "#2E623E",           // Vert pin
     "--accent-light": "#E8F0EA",
     "--border": "#BDCFC1",
     "--shadow": "0 6px 20px rgba(15, 24, 18, 0.05)",
@@ -40,40 +49,13 @@ const THEMES = {
   }
 };
 
-// Exemples de recettes pour tester le rendu graphique
-const SAMPLE_RECIPES = {
-  mine: [
-    { id: 1, title: "Tarte Tatin aux coings et romarin", duration: "45 min", level: "Moyen" },
-    { id: 2, title: "Brioche tressée à la fleur d'oranger", duration: "1h 30", level: "Avancé" },
-  ],
-  public: [
-    { id: 3, title: "Velouté de potimarron, éclats de châtaigne", duration: "30 min", level: "Facile" },
-    { id: 4, title: "Risotto d'épeautre aux champignons sauvages", duration: "40 min", level: "Moyen" },
-  ],
-  favorites: [
-    { id: 5, title: "Moelleux au chocolat noir & fleur de sel", duration: "25 min", level: "Facile" },
-  ]
-};
-
-// ── 2. ICÔNES FAITES MAIN EN CSS (CROQUIS DU CHEF) ───────────────────────────
-const Icons = {
-  Atelier: () => (
-    <span style={{ display: 'inline-block', width: '18px', height: '18px', border: '1.5px solid currentColor', borderRadius: '40% 60% 65% 35% / 40% 45% 55% 60%', transform: 'rotate(-5deg)' }} />
-  ),
-  Public: () => (
-    <span style={{ display: 'inline-block', width: '18px', height: '18px', border: '1.5px solid currentColor', borderRadius: '50% 50% 30% 70% / 50% 60% 40% 50%', transform: 'rotate(12deg)' }} />
-  ),
-  Favorites: () => (
-    <span style={{ display: 'inline-block', width: '16px', height: '16px', backgroundColor: 'currentColor', borderRadius: '50% 50% 50% 50% / 40% 40% 60% 60%', transform: 'scale(0.9) rotate(-45deg)', position: 'relative', top: '-2px' }} />
-  )
-};
-
-export default App;
-
-function App() {
+// ── 3. SQUELETTE DE L'APP AVEC TES LOGIQUES MÉTIERS MINGLÉES ────────────────
+export default function App() {
   const [activeTab, setActiveTab] = useState('mine'); // 'mine', 'public', 'favorites'
+  const [recipes, setRecipes] = useState(INITIAL_RECIPES);
+  const [searchQuery, setSearchQuery] = useState('');
 
-  // Appliquer dynamiquement les variables CSS du thème choisi
+  // Injection dynamique des variables CSS de l'ambiance active
   useEffect(() => {
     const root = document.documentElement;
     const theme = THEMES[activeTab];
@@ -82,74 +64,100 @@ function App() {
     });
   }, [activeTab]);
 
+  // FONCTIONNALITÉ : Basculer l'état favori d'une recette
+  const toggleFavorite = (id) => {
+    setRecipes(recipes.map(recipe => 
+      recipe.id === id ? { ...recipe, isFavorite: !recipe.isFavorite } : recipe
+    ));
+  };
+
+  // FONCTIONNALITÉ : Filtrage croisé (Onglets + Barre de recherche)
+  const filteredRecipes = recipes.filter(recipe => {
+    const matchesTab = activeTab === 'favorites' ? recipe.isFavorite : recipe.category === activeTab;
+    const matchesSearch = recipe.title.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesTab && matchesSearch;
+  });
+
   return (
     <>
-      <Styles/ > {/* Injection des styles CSS sous le code */}
+      <Styles /> {/* Injection du design système "Humain & Éditorial" */}
       
       <div className="app-container">
-        {/* EN-TÊTE ÉDITORIAL */}
+        {/* BARRE DE NAVIGATION ET FILTRES GRAPHICS */}
         <header className="app-header">
           <div className="header-content">
             <h1 className="logo">Cuisine.</h1>
             
-            {/* Navigation Graphique */}
+            {/* Recherche épurée style éditorial */}
+            <div className="search-wrapper">
+              <input 
+                type="text" 
+                placeholder="Rechercher une recette..." 
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="search-input"
+              />
+            </div>
+
+            {/* Sélecteur d'onglets façon carnet d'artisan */}
             <nav className="nav-tabs">
-              <button 
-                className={`tab-btn ${activeTab === 'mine' ? 'active' : ''}`}
-                onClick={() => setActiveTab('mine')}
-              >
-                <Icons.Atelier />
+              <button className={`tab-btn ${activeTab === 'mine' ? 'active' : ''}`} onClick={() => setActiveTab('mine')}>
+                <span className="icon-sketch tab-icon-1"></span>
                 <span>Mon Atelier</span>
               </button>
-              <button 
-                className={`tab-btn ${activeTab === 'public' ? 'active' : ''}`}
-                onClick={() => setActiveTab('public')}
-              >
-                <Icons.Public />
+              <button className={`tab-btn ${activeTab === 'public' ? 'active' : ''}`} onClick={() => setActiveTab('public')}>
+                <span className="icon-sketch tab-icon-2"></span>
                 <span>Marché Public</span>
               </button>
-              <button 
-                className={`tab-btn ${activeTab === 'favorites' ? 'active' : ''}`}
-                onClick={() => setActiveTab('favorites')}
-              >
-                <Icons.Favorites />
+              <button className={`tab-btn ${activeTab === 'favorites' ? 'active' : ''}`} onClick={() => setActiveTab('favorites')}>
+                <span className="icon-sketch tab-icon-3"></span>
                 <span>Mes Favoris</span>
               </button>
             </nav>
           </div>
         </header>
 
-        {/* CONTENU PRINCIPAL */}
+        {/* ZONE DE CONTENU PRINCIPALE */}
         <main className="main-content">
           <div className="section-intro">
             <p className="subtitle">
-              {activeTab === 'mine' && "Vos carnets de notes, essais et recettes secrètes."}
-              {activeTab === 'public' && "Les créations partagées par la communauté culinaire."}
-              {activeTab === 'favorites' && "Vos coups de cœur absolus, à portée de main."}
+              {activeTab === 'mine' && "Vos notes de cuisine, vos brouillons et vos secrets les mieux gardés."}
+              {activeTab === 'public' && "Les inspirations culinaires partagées librement par la communauté."}
+              {activeTab === 'favorites' && "Votre carnet de pépites gustatives approuvées et adorées."}
             </p>
           </div>
 
-          {/* Grille de cartes animées */}
-          <div className="recipes-grid">
-            {SAMPLE_RECIPES[activeTab].map((recipe) => (
-              <AnimatedCard key={recipe.id} recipe={recipe} />
-            ))}
-          </div>
+          {/* Grille de cartes dynamiques */}
+          {filteredRecipes.length > 0 ? (
+            <div className="recipes-grid">
+              {filteredRecipes.map((recipe) => (
+                <RecipeCard 
+                  key={recipe.id} 
+                  recipe={recipe} 
+                  onToggleFavorite={toggleFavorite} 
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="empty-state">
+              <p>Aucune recette ne correspond à votre recherche dans cet onglet.</p>
+            </div>
+          )}
         </main>
       </div>
     </>
   );
 }
 
-// ── 3. COMPOSANT CARTE AVEC INTERSECTION OBSERVER (INERTIE FLUIDE) ────────────
-function AnimatedCard({ recipe }) {
+// ── 4. COMPOSANT CARTE COMPLET (FONCTIONNEL + INERTIE SCROLL HAUT/BAS) ────────
+function RecipeCard({ recipe, onToggleFavorite }) {
   const cardRef = useRef(null);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          // Ajoute la classe quand elle entre, l'enlève quand elle sort (effet continu haut/bas)
+          // L'effet s'active à l'entrée ET se retire à la sortie (mouvement fluide haut/bas continu)
           if (entry.isIntersecting) {
             entry.target.classList.add('is-visible');
           } else {
@@ -157,23 +165,25 @@ function AnimatedCard({ recipe }) {
           }
         });
       },
-      { threshold: 0.05, rootMargin: "0px 0px -20px 0px" }
+      { threshold: 0.05, rootMargin: "0px 0px -10px 0px" }
     );
 
     if (cardRef.current) observer.observe(cardRef.current);
     return () => {
       if (cardRef.current) observer.unobserve(cardRef.current);
     };
-  }, [recipe]);
+  }, [recipe.id]);
 
   return (
     <div ref={cardRef} className="recipe-card">
+      {/* Vignette croquis asymétrique */}
       <div className="card-illustration-sketch">
-        {/* Un faux croquis abstrait au trait organique unique pour chaque carte */}
         <div className="sketch-shape" style={{ borderRadius: recipe.id % 2 === 0 ? '55% 45% 42% 58% / 40% 50% 50% 60%' : '35% 65% 55% 45% / 60% 40% 60% 40%' }}>
           <span>{recipe.title.charAt(0)}</span>
         </div>
       </div>
+
+      {/* Infos textuelles de la recette */}
       <div className="card-body">
         <h3 className="card-title">{recipe.title}</h3>
         <div className="card-meta">
@@ -182,15 +192,28 @@ function AnimatedCard({ recipe }) {
           <span className="meta-tag">{recipe.level}</span>
         </div>
       </div>
+
+      {/* BOUTON FONCTIONNEL : Gestion des favoris intégrée */}
+      <button 
+        className={`fav-action-btn ${recipe.isFavorite ? 'is-fav' : ''}`}
+        onClick={(e) => {
+          e.stopPropagation(); // Évite de déclencher un éventuel clic sur la carte
+          onToggleFavorite(recipe.id);
+        }}
+        aria-label="Ajouter aux favoris"
+      >
+        <svg viewBox="0 0 24 24" className="heart-stroke-icon">
+          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+        </svg>
+      </button>
     </div>
   );
 }
 
-// ── 4. STYLES CSS NATIFS ET EFFETS GRAPHIQUE HUMAINS ─────────────────────────
+// ── 5. FEUILLE DE STYLE DES EFFETS REBONDIS ET DES FORMES HANDMADE ───────────
 function Styles() {
   return (
     <style>{`
-      /* Reset & Polices Éditoriales */
       @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap');
 
       * {
@@ -203,7 +226,7 @@ function Styles() {
         background-color: var(--bg-main);
         color: var(--text-main);
         font-family: 'Plus Jakarta Sans', sans-serif;
-        transition: background-color 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        transition: background-color 0.6s cubic-bezier(0.16, 1, 0.3, 1);
         -webkit-font-smoothing: antialiased;
       }
 
@@ -213,7 +236,7 @@ function Styles() {
         flex-direction: column;
       }
 
-      /* Header Style Papier Journal Pur */
+      /* Structure En-tête */
       .app-header {
         position: sticky;
         top: 0;
@@ -222,13 +245,13 @@ function Styles() {
         backdrop-filter: blur(20px);
         -webkit-backdrop-filter: blur(20px);
         border-bottom: 1px dashed var(--border);
-        transition: background-color 0.5s, border-color 0.5s;
+        transition: background-color 0.6s, border-color 0.6s;
       }
 
       .header-content {
         max-width: 1100px;
         margin: 0 auto;
-        padding: 1.5rem 2rem;
+        padding: 1.2rem 2rem;
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -240,25 +263,49 @@ function Styles() {
         font-family: 'Playfair Display', serif;
         font-weight: 600;
         font-style: italic;
-        font-size: 2rem;
+        font-size: 1.8rem;
         letter-spacing: -0.5px;
       }
 
-      /* Onglets type "Carnet d'artisan" */
+      /* Intégration fonctionnelle du champ de recherche */
+      .search-wrapper {
+        flex-grow: 1;
+        max-width: 300px;
+      }
+
+      .search-input {
+        width: 100%;
+        padding: 10px 16px;
+        background: var(--bg-card);
+        border: 1.5px solid var(--border);
+        font-family: inherit;
+        font-size: 0.9rem;
+        color: var(--text-main);
+        outline: none;
+        transition: all 0.3s ease;
+        border-radius: 9px 13px 10px 12px / 12px 9px 14px 10px; /* Style croquis discret */
+      }
+
+      .search-input:focus {
+        border-color: var(--accent);
+        box-shadow: var(--shadow);
+      }
+
+      /* Barre d'onglets artisanale */
       .nav-tabs {
         display: flex;
-        gap: 0.75rem;
+        gap: 0.5rem;
         background: var(--bg-nav);
-        padding: 6px;
+        padding: 5px;
         border-radius: 14px;
         border: 1.5px solid var(--border);
-        transition: background 0.5s, border-color 0.5s;
+        transition: background 0.6s, border-color 0.6s;
       }
 
       .tab-btn {
         background: transparent;
         border: none;
-        padding: 10px 18px;
+        padding: 10px 16px;
         font-family: inherit;
         font-size: 0.9rem;
         font-weight: 500;
@@ -275,12 +322,22 @@ function Styles() {
         background-color: var(--bg-card);
         color: var(--accent);
         box-shadow: var(--shadow);
-        /* Ligne asymétrique type croquis */
-        border-radius: 12px 8px 14px 9px / 9px 11px 9px 12px;
         border: 1px solid var(--border);
+        border-radius: 12px 8px 14px 9px / 9px 11px 9px 12px;
       }
 
-      /* Structure du Contenu principal */
+      /* Mini icônes CSS fait main */
+      .icon-sketch {
+        display: inline-block;
+        width: 14px;
+        height: 14px;
+        border: 1.5px solid currentColor;
+      }
+      .tab-icon-1 { border-radius: 40% 60% 65% 35% / 40% 45% 55% 60%; transform: rotate(-5deg); }
+      .tab-icon-2 { border-radius: 50% 50% 30% 70% / 50% 60% 40% 50%; transform: rotate(12deg); }
+      .tab-icon-3 { background: currentColor; border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%; transform: rotate(-45deg); }
+
+      /* Contenu principal */
       .main-content {
         max-width: 1100px;
         margin: 0 auto;
@@ -289,40 +346,35 @@ function Styles() {
         flex-grow: 1;
       }
 
-      .section-intro {
-        margin-bottom: 3rem;
-      }
-
       .subtitle {
         font-family: 'Playfair Display', serif;
         font-style: italic;
-        font-size: 1.4rem;
+        font-size: 1.3rem;
         color: var(--text-muted);
         max-width: 600px;
         line-height: 1.4;
+        margin-bottom: 3rem;
       }
 
-      /* Grille Web Cassée */
       .recipes-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
         gap: 2.5rem;
       }
 
-      /* La Carte Humaine & L'effet Inertie Fluide (Scroll haut et bas) */
+      /* LA CARTE HYBRIDE : Structurée, fonctionnelle, animée en inertie haut/bas */
       .recipe-card {
+        position: relative;
         background: var(--bg-card);
         border: 2px solid var(--border);
-        /* Coins imparfaits tracés main */
-        border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+        border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px; /* Tracé main */
         padding: 1.5rem;
         box-shadow: var(--shadow);
         display: flex;
         gap: 1.5rem;
         align-items: center;
-        cursor: pointer;
         
-        /* État initial pour l'animation au scroll */
+        /* Paramètres initiaux d'animation (Inertie fluide) */
         opacity: 0;
         transform: translateY(50px) scale(0.96) rotate(1deg);
         transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), 
@@ -330,26 +382,25 @@ function Styles() {
                     background-color 0.5s, border-color 0.5s;
       }
 
-      /* Classe déclenchée par l'Intersection Observer */
+      /* Déclencheur Intersection Observer */
       .recipe-card.is-visible {
         opacity: 1;
         transform: translateY(0) scale(1) rotate(0deg);
       }
 
-      /* Micro-mouvement vivant au survol */
       .recipe-card:hover {
-        transform: translateY(-4px) scale(1.01) rotate(-0.5deg) !important;
+        transform: translateY(-5px) scale(1.01) rotate(-0.5deg) !important;
         border-color: var(--accent);
       }
 
-      /* L'illustration "Croquis au trait" */
+      /* Formes d'illustrations */
       .card-illustration-sketch {
         flex-shrink: 0;
       }
 
       .sketch-shape {
-        width: 65px;
-        height: 65px;
+        width: 60px;
+        height: 60px;
         border: 2px dashed var(--accent);
         background-color: var(--accent-light);
         color: var(--accent);
@@ -357,9 +408,9 @@ function Styles() {
         align-items: center;
         justify-content: center;
         font-family: 'Playfair Display', serif;
-        font-size: 1.5rem;
+        font-size: 1.3rem;
         font-weight: 600;
-        transition: all 0.4s ease;
+        transition: transform 0.4s ease, border-style 0.4s;
       }
 
       .recipe-card:hover .sketch-shape {
@@ -367,16 +418,16 @@ function Styles() {
         transform: rotate(8deg);
       }
 
-      /* Contenu de la fiche */
       .card-body {
         display: flex;
         flex-direction: column;
-        gap: 0.5rem;
+        gap: 0.4rem;
+        padding-right: 2rem; /* Espace pour le bouton favori */
       }
 
       .card-title {
         font-family: 'Playfair Display', serif;
-        font-size: 1.25rem;
+        font-size: 1.2rem;
         font-weight: 600;
         line-height: 1.3;
         color: var(--text-main);
@@ -386,7 +437,7 @@ function Styles() {
         display: flex;
         align-items: center;
         gap: 6px;
-        font-size: 0.8rem;
+        font-size: 0.75rem;
         text-transform: uppercase;
         letter-spacing: 0.5px;
         color: var(--text-muted);
@@ -397,18 +448,58 @@ function Styles() {
         color: var(--accent);
       }
 
-      @media (max-width: 600px) {
+      /* BOUTON FAVORIS INTERACTIF SANS EFFET "IA" */
+      .fav-action-btn {
+        position: absolute;
+        top: 1.5rem;
+        right: 1.5rem;
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        padding: 5px;
+        color: var(--text-muted);
+        transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), color 0.3s;
+      }
+
+      .heart-stroke-icon {
+        width: 20px;
+        height: 20px;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 2px;
+        transition: stroke-width 0.2s, fill 0.3s;
+      }
+
+      .fav-action-btn:hover {
+        transform: scale(1.2);
+        color: var(--accent);
+      }
+
+      /* État actif fonctionnel du favori */
+      .fav-action-btn.is-fav {
+        color: var(--accent);
+      }
+      .fav-action-btn.is-fav .heart-stroke-icon {
+        fill: currentColor;
+        stroke: var(--accent);
+      }
+
+      .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: var(--text-muted);
+        font-family: 'Playfair Display', serif;
+        font-style: italic;
+        font-size: 1.2rem;
+      }
+
+      @media (max-width: 850px) {
         .header-content {
           flex-direction: column;
-          align-items: flex-start;
+          align-items: stretch;
         }
-        .nav-tabs {
-          width: 100%;
-          justify-content: space-between;
-        }
-        .tab-btn {
-          padding: 8px 12px;
-          font-size: 0.8rem;
+        .search-wrapper {
+          max-width: 100%;
         }
       }
     `}</style>
