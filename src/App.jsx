@@ -750,7 +750,7 @@ function TimerWidget({ timer, fmt, toggle, cancel }) {
 
 // ── LOGIN / SIGNUP SCREEN ─────────────────────────────────────────────────────
 function AuthScreen({ onAuthed }) {
-  const [mode, setMode] = useState('login');
+  const [mode, setMode] = useState('login'); // 'login' | 'register'
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [password2, setPassword2] = useState('');
@@ -777,51 +777,60 @@ function AuthScreen({ onAuthed }) {
     }
   };
 
+  const inp = {
+    width:'100%', padding:'0.7rem 0.9rem', border:'1.5px solid #E4D9CC', borderRadius:9,
+    fontFamily:"'Inter',sans-serif", fontSize:'0.9rem', color:'#2C1A0E', background:'#FAFAF7', outline:'none',
+  };
+
   return (
-    <div style={{ minHeight:'100vh', display:'flex', alignItems:'center', justifyContent:'center', background:'#EFECE6', padding:'1rem' }}>
-      <div className="modal-box" style={{ maxWidth:400, padding:'2.2rem', boxShadow:'0 15px 40px rgba(0,0,0,0.06)', borderRadius:'20px 40px 20px 40px / 40px 20px 40px 20px' }}>
-        <div style={{ textAlign:'center', marginBottom:'2rem' }}>
-          <div style={{ fontSize:'2rem', marginBottom:'0.3rem' }}>📖</div>
-          <div className="editorial-title" style={{ fontSize:'1.6rem' }}>
-            Mon Carnet <span style={{ color:'#C85329', fontStyle:'italic' }}>Culinaire</span>
+    <div style={{ minHeight:'100vh', display:'flex', alignItems:'center', justifyContent:'center', background:'#FAFAF7', padding:'1.5rem' }}>
+      <div style={{ background:'#fff', borderRadius:18, width:'100%', maxWidth:400, padding:'2rem', boxShadow:'0 20px 60px rgba(44,26,14,0.12)' }}>
+        <div style={{ textAlign:'center', marginBottom:'1.75rem' }}>
+          <div style={{ fontSize:'1.8rem', marginBottom:'0.4rem' }}>📖</div>
+          <div style={{ fontFamily:"'Playfair Display',serif", fontSize:'1.5rem', color:'#2C1A0E' }}>
+            Mon <span style={{ color:'#C4622D', fontStyle:'italic' }}>Carnet</span>
           </div>
         </div>
 
-        <div style={{ display:'flex', gap:'0.4rem', marginBottom:'1.5rem', background:'#DFD9CE', borderRadius:12, padding:4, border:'1px solid #D5CEBF' }}>
-          <button type="button" onClick={()=>{setMode('login'); setError('');}} className={`form-tab-btn ${mode==='login'?'active':''}`} style={{fontSize:'0.85rem'}}>
+        <div style={{ display:'flex', gap:'0.4rem', marginBottom:'1.5rem', background:'#F0E8D8', borderRadius:10, padding:4 }}>
+          <button type="button" onClick={()=>{setMode('login'); setError('');}}
+            style={{ flex:1, padding:'0.5rem', borderRadius:8, border:'none', cursor:'pointer', fontFamily:"'Inter',sans-serif", fontWeight:600, fontSize:'0.85rem', background: mode==='login'?'#fff':'transparent', color: mode==='login'?'#2C1A0E':'#8C7B6B', boxShadow: mode==='login'?'0 1px 4px rgba(0,0,0,0.08)':'none' }}>
             Connexion
           </button>
-          <button type="button" onClick={()=>{setMode('register'); setError('');}} className={`form-tab-btn ${mode==='register'?'active':''}`} style={{fontSize:'0.85rem'}}>
-            Créer un compte
+          <button type="button" onClick={()=>{setMode('register'); setError('');}}
+            style={{ flex:1, padding:'0.5rem', borderRadius:8, border:'none', cursor:'pointer', fontFamily:"'Inter',sans-serif", fontWeight:600, fontSize:'0.85rem', background: mode==='register'?'#fff':'transparent', color: mode==='register'?'#2C1A0E':'#8C7B6B', boxShadow: mode==='register'?'0 1px 4px rgba(0,0,0,0.08)':'none' }}>
+            Inscription
           </button>
         </div>
 
         <form onSubmit={submit}>
-          <div style={{ marginBottom:'1rem' }}>
-            <label className="form-label">Identifiant unique (Pseudo)</label>
-            <input className="form-input" value={username} onChange={e=>setUsername(e.target.value)} placeholder="Ex: augustin_b" autoComplete="username" />
+          <div style={{ marginBottom:'0.9rem' }}>
+            <label style={{ display:'block', fontSize:'0.75rem', fontWeight:600, textTransform:'uppercase', letterSpacing:'0.06em', color:'#8C7B6B', marginBottom:'0.35rem' }}>Pseudo</label>
+            <input style={inp} value={username} onChange={e=>setUsername(e.target.value)} placeholder="ex : augustin" autoComplete="username" />
           </div>
-          <div style={{ marginBottom: mode==='register' ? '1rem' : '1.5rem' }}>
-            <label className="form-label">Mot de passe</label>
-            <input type="password" className="form-input" value={password} onChange={e=>setPassword(e.target.value)} placeholder="Minimum 6 caractères" autoComplete={mode==='register'?'new-password':'current-password'} />
+          <div style={{ marginBottom: mode==='register' ? '0.9rem' : '1.5rem' }}>
+            <label style={{ display:'block', fontSize:'0.75rem', fontWeight:600, textTransform:'uppercase', letterSpacing:'0.06em', color:'#8C7B6B', marginBottom:'0.35rem' }}>Mot de passe</label>
+            <input type="password" style={inp} value={password} onChange={e=>setPassword(e.target.value)} placeholder="6 caractères minimum" autoComplete={mode==='register'?'new-password':'current-password'} />
           </div>
           {mode==='register' && (
             <div style={{ marginBottom:'1.5rem' }}>
-              <label className="form-label">Confirmation du mot de passe</label>
-              <input type="password" className="form-input" value={password2} onChange={e=>setPassword2(e.target.value)} autoComplete="new-password" />
+              <label style={{ display:'block', fontSize:'0.75rem', fontWeight:600, textTransform:'uppercase', letterSpacing:'0.06em', color:'#8C7B6B', marginBottom:'0.35rem' }}>Confirmer le mot de passe</label>
+              <input type="password" style={inp} value={password2} onChange={e=>setPassword2(e.target.value)} autoComplete="new-password" />
             </div>
           )}
 
-          {error && <div style={{ marginBottom:'1rem', fontSize:'0.82rem', color:'#dc2626', background:'#fef2f2', padding:'0.6rem 0.8rem', borderRadius:8, border:'1px solid #fee2e2', fontWeight:500 }}>{error}</div>}
+          {error && <div style={{ marginBottom:'1rem', fontSize:'0.82rem', color:'#dc2626', background:'#fef2f2', padding:'0.6rem 0.8rem', borderRadius:8 }}>{error}</div>}
 
-          <button type="submit" disabled={loading || !username.trim() || !password} className="primary-action-btn" style={{ width:'100%', padding:'0.8rem', fontSize:'0.9rem' }}>
-            {loading ? '⟳ Traitement des accès…' : (mode==='register' ? "Valider l'inscription" : 'Entrer dans le carnet')}
+          <button type="submit" disabled={loading || !username.trim() || !password}
+            style={{ width:'100%', padding:'0.75rem', borderRadius:9, border:'none', background:'#C4622D', color:'#fff', fontFamily:"'Inter',sans-serif", fontWeight:600, fontSize:'0.9rem', cursor: loading?'default':'pointer', opacity: loading?0.7:1 }}>
+            {loading ? '⟳ Un instant…' : (mode==='register' ? "S'inscrire" : 'Se connecter')}
           </button>
         </form>
       </div>
     </div>
   );
 }
+
 
 // ── MAIN APP ──────────────────────────────────────────────────────────────────
 export default function App() {
