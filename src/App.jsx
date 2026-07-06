@@ -783,7 +783,7 @@ function AuthScreen({ onAuthed }) {
         <div style={{ textAlign:'center', marginBottom:'2rem' }}>
           <div style={{ fontSize:'2rem', marginBottom:'0.3rem' }}>📖</div>
           <div className="editorial-title" style={{ fontSize:'1.6rem' }}>
-            Mon Carrefour <span style={{ color:'#C85329', fontStyle:'italic' }}>Culinaire</span>
+            Mon Carnet <span style={{ color:'#C85329', fontStyle:'italic' }}>Culinaire</span>
           </div>
         </div>
 
