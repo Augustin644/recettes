@@ -38,6 +38,18 @@ const THEMES = {
     "--accent-light": "#E8F0EA",
     "--border": "#BDCFC1",
     "--shadow": "0 6px 20px rgba(15, 24, 18, 0.05)",
+  },
+  favorites: {
+    "--bg-main": "#EAE3E3",          // Rouge lin / rosé doux désaturé
+    "--bg-card": "#FFFFFF",
+    "--bg-header": "rgba(234, 227, 227, 0.85)",
+    "--bg-nav": "#DACDCD",
+    "--text-main": "#241111",        // Grenat très sombre
+    "--text-muted": "#685353",       // Lie de vin poudré
+    "--accent": "#A93838",           // Rouge garance / opéra mat
+    "--accent-light": "#F6EEEE",
+    "--border": "#D2BFBF",
+    "--shadow": "0 6px 20px rgba(36, 17, 17, 0.05)",
   }
 };
 
@@ -238,9 +250,9 @@ function useTimer() {
 // ── TOAST ─────────────────────────────────────────────────────────────────────
 function Toast({ toasts }) {
   return (
-    <div style={{ position:'fixed', bottom:'2rem', left:'50%', transform:'translateX(-50%)', zIndex:1000, display:'flex', flexDirection:'column', gap:'0.5rem', alignItems:'center' }}>
+    <div style={{ position:'fixed', bottom:'2rem', left:'50%', transform:'translateX(-50%)', zIndex:1000, display:'flex', flexDirection:'column', gap:'0.5rem', alignItems:'center', width:'90%', maxWidth:'400px' }}>
       {toasts.map(t => (
-        <div key={t.id} style={{ background: t.type==='error'?'#dc2626':t.type==='success'?'#2E623E':'var(--text-main)', color:'#fff', padding:'0.6rem 1.4rem', borderRadius:'25px', fontSize:'0.85rem', fontWeight:500, boxShadow:'var(--shadow)', border:'1px solid var(--border)', textTransform:'capitalize' }}>
+        <div key={t.id} style={{ background: t.type==='error'?'#dc2626':t.type==='success'?'#2E623E':'var(--text-main)', color:'#fff', padding:'0.6rem 1.4rem', borderRadius:'25px', fontSize:'0.85rem', fontWeight:500, boxShadow:'var(--shadow)', border:'1px solid var(--border)', textTransform:'capitalize', textAlign:'center', width:'100%' }}>
           {t.msg}
         </div>
       ))}
@@ -257,7 +269,7 @@ function DiffDots({ d }) {
 }
 
 // ── RECIPE CARD (WITH SCROLL INERTIA ANIMATION HAUT/BAS) ──────────────────────
-function RecipeCard({ recipe, onOpen, onDelete, onAddToProfile, isOwner }) {
+function RecipeCard({ recipe, onOpen, onDelete, onAddToProfile, isOwner, isFav, onToggleFav }) {
   const cardRef = useRef(null);
   const t = recipe.time;
   const tLabel = t ? (t < 60 ? `${t}min` : `${Math.floor(t/60)}h${t%60?t%60+'min':''}`) : null;
@@ -286,11 +298,16 @@ function RecipeCard({ recipe, onOpen, onDelete, onAddToProfile, isOwner }) {
       onClick={() => onOpen(recipe.id)}
       className="recipe-card"
     >
-      {isOwner ? (
-        <button className="card-action-btn delete-btn" onClick={e => { e.stopPropagation(); onDelete(recipe.id); }} title="Supprimer">✕</button>
-      ) : (
-        <button className="card-action-btn add-btn" onClick={e => { e.stopPropagation(); onAddToProfile(recipe); }}>+ Profil</button>
-      )}
+      <div className="card-actions-container" style={{ position:'absolute', top:10, right:10, display:'flex', gap:6, zIndex:5 }}>
+        <button className="card-action-inline-btn fav-btn" style={{ color: isFav ? '#dc2626' : 'var(--text-muted)' }} onClick={e => { e.stopPropagation(); onToggleFav(recipe.id); }} title="Favoris">
+          {isFav ? '❤️' : '🤍'}
+        </button>
+        {isOwner ? (
+          <button className="card-action-inline-btn delete-btn" onClick={e => { e.stopPropagation(); onDelete(recipe.id); }} title="Supprimer">✕</button>
+        ) : (
+          <button className="card-action-inline-btn add-btn" onClick={e => { e.stopPropagation(); onAddToProfile(recipe); }}>+ Profil</button>
+        )}
+      </div>
 
       {recipe.photoURL ? (
         <div style={{ position:'relative', height:140, overflow:'hidden', borderRadius:'14px 14px 0 0', borderBottom:'1px dashed var(--border)' }}>
@@ -486,7 +503,7 @@ function RecipeForm({ initial = {}, onClose, onSave, onNeedApiKey, title = "Nouv
           <input className="form-input" value={name} onChange={e=>setName(e.target.value)} placeholder="Ex: Risotto crémeux aux morilles" />
         </div>
 
-        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'1rem', marginBottom:'1.2rem' }}>
+        <div className="form-grid-2">
           <div>
             <label className="form-label">Catégorie</label>
             <select className="form-input" value={cat} onChange={e=>setCat(e.target.value)}>{CATEGORIES.filter(c=>c!=='Toutes').map(c=><option key={c}>{c}</option>)}</select>
@@ -497,7 +514,7 @@ function RecipeForm({ initial = {}, onClose, onSave, onNeedApiKey, title = "Nouv
           </div>
         </div>
 
-        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:'0.8rem', marginBottom:'1.2rem' }}>
+        <div className="form-grid-3">
           <div>
             <label className="form-label">Portions</label>
             <input className="form-input" type="number" value={portions} onChange={e=>setPortions(e.target.value)} min={1} />
@@ -549,7 +566,7 @@ function RecipeForm({ initial = {}, onClose, onSave, onNeedApiKey, title = "Nouv
         {/* Visibility Buttons Toggle */}
         <div style={{ marginBottom:'1.8rem' }}>
           <label className="form-label">Statut de partage</label>
-          <div style={{ display:'flex', gap:'0.8rem' }}>
+          <div className="visibility-toggle-container">
             <button type="button" onClick={()=>setVisibility('private')} className={`visibility-toggle-btn ${visibility==='private'?'active':''}`}>
               🔒 Atelier Privé <span style={{fontWeight:400, opacity:0.8}}>(Personnel)</span>
             </button>
@@ -559,8 +576,8 @@ function RecipeForm({ initial = {}, onClose, onSave, onNeedApiKey, title = "Nouv
           </div>
         </div>
 
-        <div style={{ display:'flex', gap:'1rem', justifyContent:'flex-end' }}>
-          <button onClick={onClose} disabled={saving} className="secondary-action-btn" style={{ padding:'0.6rem 1.4rem' }}>Annuler</button>
+        <div className="form-actions-footer">
+          <button onClick={onClose} disabled={saving} className="secondary-action-btn">Annuler</button>
           <button onClick={handleSave} disabled={saving} className="primary-action-btn">
             {saving ? '⟳ Traitement Firebase…' : 'Valider & Sauvegarder'}
           </button>
@@ -592,7 +609,7 @@ function SettingsModal({ onClose }) {
 }
 
 // ── DETAIL MODAL ──────────────────────────────────────────────────────────────
-function DetailModal({ recipe, onClose, onEdit, onAddToProfile, isOwner, timerCtx }) {
+function DetailModal({ recipe, onClose, onEdit, onAddToProfile, isOwner, timerCtx, isFav, onToggleFav }) {
   const [mult, setMult] = useState(1);
   const [exporting, setExporting] = useState(false);
   const portions = Math.round(recipe.portions * mult);
@@ -623,9 +640,14 @@ function DetailModal({ recipe, onClose, onEdit, onAddToProfile, isOwner, timerCt
               <div style={{ position:'absolute', inset:0, background:'linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 60%)' }} />
             </>
           ) : null}
-          <div style={{ padding: recipe.photoURL ? '1.5rem' : '2.5rem 1.5rem 1.5rem', position: recipe.photoURL ? 'absolute' : 'relative', bottom:0, left:0, right:0, textAlign:'left' }}>
+          <div className="detail-hero-overlay-content" style={{ padding: recipe.photoURL ? '1.5rem' : '2.5rem 1.5rem 1.5rem', position: recipe.photoURL ? 'absolute' : 'relative', bottom:0, left:0, right:0, textAlign:'left' }}>
             {!recipe.photoURL && <div style={{ fontSize:'3.5rem', marginBottom:'0.6rem' }}>{recipe.emoji||'🍽️'}</div>}
-            <div style={{ fontSize:'0.72rem', fontWeight:600, textTransform:'uppercase', letterSpacing:'0.1em', color: recipe.photoURL ? '#E8F0EA' : 'var(--accent)', marginBottom:'0.3rem' }}>{recipe.cat}</div>
+            <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'0.3rem' }}>
+              <div style={{ fontSize:'0.72rem', fontWeight:600, textTransform:'uppercase', letterSpacing:'0.1em', color: recipe.photoURL ? '#E8F0EA' : 'var(--accent)' }}>{recipe.cat}</div>
+              <button style={{ background:'transparent', border:'none', fontSize:'1.4rem', cursor:'pointer' }} onClick={() => onToggleFav(recipe.id)}>
+                {isFav ? '❤️' : '🤍'}
+              </button>
+            </div>
             <div className="editorial-title" style={{ fontSize:'1.8rem', color: recipe.photoURL ? '#fff' : 'var(--text-main)', marginBottom:'0.8rem', textShadow: recipe.photoURL ? '0 2px 8px rgba(0,0,0,0.5)' : 'none' }}>
               {recipe.photoURL && <span style={{marginRight:'0.6rem'}}>{recipe.emoji||'🍽️'}</span>}
               {recipe.name}
@@ -646,7 +668,7 @@ function DetailModal({ recipe, onClose, onEdit, onAddToProfile, isOwner, timerCt
         <div style={{ padding:'1.5rem' }}>
           {/* Servings Adjuster */}
           <div style={{ display:'flex', alignItems:'center', gap:'1rem', background:'var(--bg-nav)', border:'1px solid var(--border)', borderRadius:12, padding:'0.6rem 1.2rem', marginBottom:'1.5rem' }}>
-            <span style={{ fontSize:'0.85rem', fontWeight:500, color:'var(--text-muted)', flex:1 }}>Ajustement des proportions</span>
+            <span style={{ fontSize:'0.85rem', fontWeight:500, color:'var(--text-muted)', flex:1 }}>Proportions</span>
             <div style={{ display:'flex', alignItems:'center', gap:'0.8rem' }}>
               <button onClick={()=>changeMult(-1)} className="portions-round-btn">−</button>
               <span style={{ fontWeight:700, fontSize:'1.1rem', minWidth:'1.5rem', textAlign:'center' }}>{portions}</span>
@@ -659,8 +681,8 @@ function DetailModal({ recipe, onClose, onEdit, onAddToProfile, isOwner, timerCt
           <div style={{ background:'var(--bg-main)', borderRadius:12, overflow:'hidden', marginBottom:'1.8rem', border:'1px solid var(--border)' }}>
             {recipe.ingredients.map((ing, i) => (
               <div key={i} style={{ display:'flex', justifyContent:'space-between', padding:'0.6rem 1.2rem', borderBottom: i<recipe.ingredients.length-1?'1px dashed var(--border)':'none', fontSize:'0.9rem', background: i%2===0?'#fff':'transparent' }}>
-                <span style={{ color:'var(--text-main)' }}>{ing.name}</span>
-                <span style={{ color:'var(--accent)', fontWeight:600 }}>{fmtQty(ing.qty)}</span>
+                <span style={{ color:'var(--text-main)', paddingRight:'0.5rem' }}>{ing.name}</span>
+                <span style={{ color:'var(--accent)', fontWeight:600, flexShrink:0 }}>{fmtQty(ing.qty)}</span>
               </div>
             ))}
           </div>
@@ -692,15 +714,15 @@ function DetailModal({ recipe, onClose, onEdit, onAddToProfile, isOwner, timerCt
           )}
 
           {/* Bottom Dialog Action Drawer */}
-          <div style={{ display:'flex', gap:'0.8rem', flexWrap:'wrap', justifyContent:'flex-end', paddingTop:'1rem', borderTop:'1px dashed var(--border)' }}>
+          <div className="modal-actions-drawer">
             <button onClick={onClose} className="secondary-action-btn">Fermer</button>
             <button onClick={handleExport} disabled={exporting} className="secondary-action-btn" style={{ background:'var(--bg-nav)', color:'var(--text-main)' }}>
-              {exporting ? '⟳ Compilation PDF…' : '📄 Exporter au format PDF'}
+              {exporting ? '⟳ Compilation PDF…' : '📄 Exporter PDF'}
             </button>
             {isOwner ? (
-              <button onClick={onEdit} className="primary-action-btn">✏️ Éditer la recette</button>
+              <button onClick={onEdit} className="primary-action-btn">✏️ Éditer</button>
             ) : (
-              <button onClick={() => onAddToProfile(recipe)} className="primary-action-btn">💾 Ajouter à mon carnet</button>
+              <button onClick={() => onAddToProfile(recipe)} className="primary-action-btn">💾 Ajouter au carnet</button>
             )}
           </div>
         </div>
@@ -756,7 +778,7 @@ function AuthScreen({ onAuthed }) {
   };
 
   return (
-    <div style={{ minHeight:'100vh', display:'flex', alignItems:'center', justifyContent:'center', background:'#EFECE6', padding:'1.5rem' }}>
+    <div style={{ minHeight:'100vh', display:'flex', alignItems:'center', justifyContent:'center', background:'#EFECE6', padding:'1rem' }}>
       <div className="modal-box" style={{ maxWidth:400, padding:'2.2rem', boxShadow:'0 15px 40px rgba(0,0,0,0.06)', borderRadius:'20px 40px 20px 40px / 40px 20px 40px 20px' }}>
         <div style={{ textAlign:'center', marginBottom:'2rem' }}>
           <div style={{ fontSize:'2rem', marginBottom:'0.3rem' }}>📖</div>
@@ -807,6 +829,9 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('mine');
   const [myRecipes, setMyRecipes] = useState([]);
   const [publicRecipes, setPublicRecipes] = useState([]);
+  const [favIds, setFavIds] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("culinary_favs") || "[]"); } catch { return []; }
+  });
   const [activeCategory, setActiveCategory] = useState('Toutes');
   const [search, setSearch] = useState('');
   const [showAdd, setShowAdd] = useState(false);
@@ -822,6 +847,11 @@ export default function App() {
     setToasts(t => [...t, { id, msg, type }]);
     setTimeout(() => setToasts(t => t.filter(x => x.id !== id)), duration);
   }, []);
+
+  // Save favorites to local storage whenever they change
+  useEffect(() => {
+    localStorage.setItem("culinary_favs", JSON.stringify(favIds));
+  }, [favIds]);
 
   // Injection des variables CSS du thème selon l'onglet actif
   useEffect(() => {
@@ -931,7 +961,30 @@ export default function App() {
     }
   }, [addToast, user]);
 
-  const recipes = activeTab === 'mine' ? myRecipes : publicRecipes;
+  const toggleFavorite = useCallback((id) => {
+    setFavIds(prev => {
+      const exists = prev.includes(id);
+      if (exists) {
+        addToast('Retiré des favoris', 'info');
+        return prev.filter(x => x !== id);
+      } else {
+        addToast('Ajouté aux favoris', 'success');
+        return [...prev, id];
+      }
+    });
+  }, [addToast]);
+
+  // Sélection de la source des données selon l'onglet
+  let recipes = [];
+  if (activeTab === 'mine') {
+    recipes = myRecipes;
+  } else if (activeTab === 'public') {
+    recipes = publicRecipes;
+  } else if (activeTab === 'favorites') {
+    // Fusionne toutes les sources connues pour retrouver l'objet complet favori
+    const allKnown = [...myRecipes, ...publicRecipes];
+    recipes = favIds.map(id => allKnown.find(r => r.id === id)).filter(Boolean);
+  }
 
   const filtered = recipes.filter(r => {
     const matchCat = activeCategory === 'Toutes' || r.cat === activeCategory;
@@ -950,7 +1003,8 @@ export default function App() {
     error:   { color:'#dc2626', icon:'⚠', label:'Déconnecté' },
   }[syncStatus];
 
-  const detailRecipe = recipes.find(r => r.id === detailId);
+  const allCombined = [...myRecipes, ...publicRecipes];
+  const detailRecipe = allCombined.find(r => r.id === detailId);
   const editRecipe = myRecipes.find(r => r.id === editId);
   const needApiKey = () => { addToast("Clé API absente. Ouvrez les réglages (⚙️).", 'error'); setShowSettings(true); };
 
@@ -990,28 +1044,34 @@ export default function App() {
 
             {/* Sync Profile Badge & Meta Controls */}
             <div className="user-profile-bar">
-              <span className="sync-badge" style={{ color: statusInfo.color }}>
-                <span>{statusInfo.icon}</span>{statusInfo.label}
-              </span>
-              <span className="user-name-tag">👤 {user.displayName}</span>
+              <div className="user-profile-meta-row">
+                <span className="sync-badge" style={{ color: statusInfo.color }}>
+                  <span>{statusInfo.icon}</span>{statusInfo.label}
+                </span>
+                <span className="user-name-tag">👤 {user.displayName}</span>
+                <button onClick={()=>setShowSettings(true)} className="header-icon-btn" title="Paramètres d'API">⚙️</button>
+              </div>
               
-              <button onClick={()=>setShowSettings(true)} className="header-icon-btn" title="Paramètres d'API">⚙️</button>
-              
-              <button onClick={()=>logoutUser()} className="secondary-action-btn" style={{ padding:'0.45rem 0.8rem', fontSize:'0.8rem' }}>
-                Quitter
-              </button>
-              
-              <button onClick={()=>setShowAdd(true)} className="primary-action-btn">
-                + Ajouter
-              </button>
+              <div className="user-profile-actions-row">
+                <button onClick={()=>logoutUser()} className="secondary-action-btn logout-btn">
+                  Quitter
+                </button>
+                <button onClick={()=>setShowAdd(true)} className="primary-action-btn add-recipe-btn">
+                  + Ajouter
+                </button>
+              </div>
             </div>
           </div>
         </header>
 
         {/* WORKSPACE PROFILE TABS */}
         <div style={{ borderBottom:'1px dashed var(--border)', background:'var(--bg-header)' }}>
-          <div style={{ maxWidth:1100, margin:'0 auto', display:'flex', padding:'0 2rem' }}>
-            {[{k:'mine', label:'📕 Mon Atelier'}, {k:'public', label:'🌐 Répertoire Commun'}].map(t => (
+          <div className="tabs-container">
+            {[
+              {k:'mine', label:'📕 Mon Atelier'}, 
+              {k:'public', label:'🌐 Répertoire'},
+              {k:'favorites', label:'❤️ Favoris'}
+            ].map(t => (
               <button key={t.k} onClick={()=>{ setActiveTab(t.k); setActiveCategory('Toutes'); setDetailId(null); }}
                 className={`tab-btn ${activeTab===t.k ? 'active' : ''}`}>
                 {t.label}
@@ -1021,8 +1081,8 @@ export default function App() {
         </div>
 
         {/* HORIZONTAL CATEGORIES BAR */}
-        <div style={{ background:'var(--bg-nav)', borderBottom:'1px solid var(--border)', overflowX:'auto', scrollbarWidth:'none' }}>
-          <div style={{ maxWidth:1100, margin:'0 auto', display:'flex', gap:'0.4rem', padding:'0.6rem 2rem' }}>
+        <div className="categories-outer-bar">
+          <div className="categories-inner-container">
             {cats.map(c => (
               <button key={c} onClick={()=>setActiveCategory(c)} className={`category-pill ${c===activeCategory?'active':''}`}>
                 {c}
@@ -1042,7 +1102,8 @@ export default function App() {
               <div className="recipes-grid">
                 {rs.map(r => (
                   <RecipeCard key={r.id} recipe={r} onOpen={setDetailId} onDelete={handleDelete}
-                    onAddToProfile={handleAddToProfile} isOwner={r.ownerId === user.uid} />
+                    onAddToProfile={handleAddToProfile} isOwner={r.ownerId === user.uid} 
+                    isFav={favIds.includes(r.id)} onToggleFav={toggleFavorite} />
                 ))}
               </div>
             </div>
@@ -1052,7 +1113,11 @@ export default function App() {
             <div className="empty-state">
               <div style={{ fontSize:'2.5rem', marginBottom:'0.5rem' }}>📖</div>
               <p className="editorial-title" style={{ fontSize:'1.2rem', marginBottom:'0.2rem' }}>Aucune fiche disponible</p>
-              <p style={{ fontSize:'0.9rem', color:'var(--text-muted)' }}>{activeTab === 'mine' ? 'Ajoutez votre première création culinaire à l\'Atelier.' : 'Aucun partage public ne correspond à vos critères.'}</p>
+              <p style={{ fontSize:'0.9rem', color:'var(--text-muted)' }}>
+                {activeTab === 'mine' && "Ajoutez votre première création culinaire à l'Atelier."}
+                {activeTab === 'public' && "Aucun partage public ne correspond à vos critères."}
+                {activeTab === 'favorites' && "Marquez vos recettes favorites d'un cœur pour les retrouver ici."}
+              </p>
             </div>
           )}
         </main>
@@ -1079,6 +1144,8 @@ export default function App() {
           onEdit={() => { setDetailId(null); setEditId(detailId); }}
           onAddToProfile={handleAddToProfile}
           timerCtx={timerCtx}
+          isFav={favIds.includes(detailRecipe.id)}
+          onToggleFav={toggleFavorite}
         />
       )}
 
@@ -1193,6 +1260,12 @@ function StylesStructure() {
         flex-wrap: wrap;
       }
 
+      .user-profile-meta-row, .user-profile-actions-row {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+      }
+
       .sync-badge {
         font-size: 0.72rem;
         font-weight: 700;
@@ -1212,6 +1285,13 @@ function StylesStructure() {
       }
 
       /* Custom Handmade Controls */
+      .tabs-container {
+        max-width: 1100px;
+        margin: 0 auto;
+        display: flex;
+        padding: 0 2rem;
+      }
+
       .tab-btn {
         background: transparent;
         border: none;
@@ -1229,6 +1309,24 @@ function StylesStructure() {
       .tab-btn.active {
         color: var(--accent);
         border-bottom-color: var(--accent);
+      }
+
+      .categories-outer-bar {
+        background: var(--bg-nav);
+        border-bottom: 1px solid var(--border);
+        overflow-x: auto;
+        scrollbar-width: none;
+      }
+      .categories-outer-bar::-webkit-scrollbar {
+        display: none;
+      }
+
+      .categories-inner-container {
+        max-width: 1100px;
+        margin: 0 auto;
+        display: flex;
+        gap: 0.4rem;
+        padding: 0.6rem 2rem;
       }
 
       .category-pill {
@@ -1348,28 +1446,34 @@ function StylesStructure() {
         height: 44px;
       }
 
-      /* Floating Overlay Card Management Switches */
-      .card-action-btn {
-        position: absolute;
-        top: 10px;
-        right: 10px;
+      /* Inline actions layout on cards */
+      .card-action-inline-btn {
         border: 1px solid var(--border);
         cursor: pointer;
         font-weight: 600;
-        z-index: 5;
         box-shadow: 0 2px 6px rgba(0,0,0,0.05);
         transition: transform 0.2s, background-color 0.2s;
+        background: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
       }
-      .card-action-btn:hover { transform: scale(1.08); }
+      .card-action-inline-btn:hover { transform: scale(1.08); }
 
       .delete-btn {
-        background: #ffffff;
         color: var(--text-muted);
         width: 28px;
         height: 28px;
         border-radius: 6px;
       }
       .delete-btn:hover { color: #dc2626; border-color: #fca5a5; }
+
+      .fav-btn {
+        width: 28px;
+        height: 28px;
+        border-radius: 6px;
+        font-size: 0.9rem;
+      }
 
       .add-btn {
         background: var(--accent);
@@ -1378,6 +1482,7 @@ function StylesStructure() {
         padding: 4px 10px;
         border-radius: 8px;
         font-size: 0.72rem;
+        height: 28px;
       }
 
       /* Structural Overlay Overlays Mechanics */
@@ -1431,6 +1536,20 @@ function StylesStructure() {
       }
       .form-input:focus { border-color: var(--accent); background: #fff; }
 
+      .form-grid-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin-bottom: 1.2rem;
+      }
+
+      .form-grid-3 {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 0.8rem;
+        margin-bottom: 1.2rem;
+      }
+
       .form-tab-btn {
         flex: 1;
         padding: 0.55rem;
@@ -1462,6 +1581,7 @@ function StylesStructure() {
         font-weight: 600;
         cursor: pointer;
         box-shadow: var(--shadow);
+        white-space: nowrap;
       }
       .primary-action-btn:hover { opacity: 0.9; }
 
@@ -1475,6 +1595,7 @@ function StylesStructure() {
         font-size: 0.88rem;
         font-weight: 600;
         cursor: pointer;
+        white-space: nowrap;
       }
       .secondary-action-btn:hover { border-color: var(--text-main); color: var(--text-main); }
 
@@ -1540,6 +1661,11 @@ function StylesStructure() {
         margin-top: 6px;
       }
 
+      .visibility-toggle-container {
+        display: flex;
+        gap: 0.8rem;
+      }
+
       .visibility-toggle-btn {
         flex: 1;
         padding: 0.7rem;
@@ -1557,6 +1683,12 @@ function StylesStructure() {
         border-color: var(--accent);
         background: var(--accent-light);
         color: var(--accent);
+      }
+
+      .form-actions-footer {
+        display: flex;
+        gap: 1rem;
+        justify-content: flex-end;
       }
 
       /* Detail Presentation Elements Module */
@@ -1612,6 +1744,15 @@ function StylesStructure() {
         margin-bottom: 1.5rem;
       }
 
+      .modal-actions-drawer {
+        display: flex;
+        gap: 0.8rem;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        padding-top: 1rem;
+        border-top: 1px dashed var(--border);
+      }
+
       /* Floating Active Core Countdown Component */
       .timer-floating-widget {
         position: fixed;
@@ -1623,7 +1764,7 @@ function StylesStructure() {
         border-radius: 16px;
         padding: 1.2rem;
         box-shadow: 0 10px 30px rgba(0,0,0,0.25);
-        zIndex: 500;
+        z-index: 500;
         min-width: 230px;
       }
 
@@ -1660,10 +1801,95 @@ function StylesStructure() {
         color: var(--text-muted);
       }
 
+      /* ── RESPONSIVE ENGINE (MOBILE & TABLETS AUTOMATION) ── */
       @media (max-width: 850px) {
-        .header-content { flex-direction: column; align-items: stretch; }
-        .search-wrapper { max-width: 100%; }
-        .user-profile-bar { justify-content: space-between; }
+        .header-content {
+          flex-direction: column;
+          align-items: stretch;
+          padding: 1rem;
+          gap: 0.8rem;
+        }
+        .search-wrapper {
+          max-width: 100%;
+        }
+        .user-profile-bar {
+          justify-content: space-between;
+          width: 100%;
+        }
+        .user-profile-actions-row {
+          flex-grow: 1;
+          justify-content: flex-end;
+        }
+        .add-recipe-btn, .logout-btn {
+          padding: 0.6rem 1rem;
+          font-size: 0.85rem;
+        }
+        .tabs-container {
+          padding: 0 1rem;
+        }
+        .categories-inner-container {
+          padding: 0.6rem 1rem;
+        }
+        .main-content {
+          padding: 1rem;
+        }
+      }
+
+      @media (max-width: 550px) {
+        .form-grid-2, .form-grid-3 {
+          grid-template-columns: 1fr;
+          gap: 0.8rem;
+          margin-bottom: 0.8rem;
+        }
+        .visibility-toggle-container {
+          flex-direction: column;
+          gap: 0.6rem;
+        }
+        .form-layout {
+          padding: 1.2rem;
+        }
+        .modal-backdrop {
+          padding: 0.5rem;
+        }
+        .modal-box {
+          max-height: 95vh;
+        }
+        .form-actions-footer {
+          flex-direction: column-reverse;
+          gap: 0.6rem;
+        }
+        .form-actions-footer button {
+          width: 100%;
+          padding: 0.75rem;
+        }
+        .modal-actions-drawer {
+          flex-direction: column;
+          gap: 0.6rem;
+        }
+        .modal-actions-drawer button {
+          width: 100%;
+          padding: 0.75rem;
+          text-align: center;
+        }
+        .detail-hero-overlay-content {
+          position: relative !important;
+          background: var(--bg-card) !important;
+          color: var(--text-main) !important;
+          padding: 1rem !important;
+        }
+        .detail-hero-overlay-content h1 {
+          color: var(--text-main) !important;
+          text-shadow: none !important;
+        }
+        .detail-meta-pill {
+          background: var(--bg-nav) !important;
+        }
+        .timer-floating-widget {
+          left: 1rem;
+          right: 1rem;
+          bottom: 1rem;
+          min-width: auto;
+        }
       }
     `}</style>
   );
