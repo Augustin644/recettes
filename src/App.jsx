@@ -482,7 +482,7 @@ function RecipeForm({ initial = {}, onClose, onSave, onNeedApiKey, title = "Nouv
           <button onClick={onClose} className="close-square-btn">✕</button>
         </div>
 
-        <AIPanel onResult={applyAIResult} onUsePhotoAsIllustration={setPhotoFile} onNeedApiKey={onNeedApiKey} />
+        <AIPanel onResult={applyAIResult} onUsePhotoAsIllustration={setPhotoFile} onNeedApiKey={needApiKey} />
 
         {/* Photo input */}
         <div style={{ marginBottom:'1.2rem' }}>
@@ -535,9 +535,9 @@ function RecipeForm({ initial = {}, onClose, onSave, onNeedApiKey, title = "Nouv
         <div style={{ marginBottom:'1.2rem' }}>
           <label className="form-label">Ingrédients requis</label>
           {ings.map((ing, i) => (
-            <div key={i} style={{ display:'flex', gap:'0.5rem', marginBottom:'0.4rem', alignItems:'center' }}>
-              <input className="form-input" style={{ width:85 }} value={ing.qty} onChange={e=>setIng(i,'qty',e.target.value)} placeholder="Qté (ex: 200g)" />
-              <input className="form-input" style={{ flex:1 }} value={ing.name} onChange={e=>setIng(i,'name',e.target.value)} placeholder="Ingrédient" />
+            <div key={i} className="form-ingredient-row" style={{ display:'flex', gap:'0.5rem', marginBottom:'0.4rem', alignItems:'center' }}>
+              <input className="form-input qty-input" style={{ width:85 }} value={ing.qty} onChange={e=>setIng(i,'qty',e.target.value)} placeholder="Qté (ex: 200g)" />
+              <input className="form-input name-input" style={{ flex:1 }} value={ing.name} onChange={e=>setIng(i,'name',e.target.value)} placeholder="Ingrédient" />
               <button onClick={()=>rmIng(i)} className="line-item-remove-btn">−</button>
             </div>
           ))}
@@ -598,7 +598,7 @@ function SettingsModal({ onClose }) {
         <p style={{ fontSize:'0.88rem', color:'var(--text-muted)', lineHeight:1.6, marginBottom:'1.2rem' }}>
           Votre clé Google Gemini active l'extraction et l'idéation automatisée. Sauvegardée localement dans votre propre navigateur.
         </p>
-        <input type="password" value={key} onChange={e=>setKey(e.target.value)} placeholder="AIzaSy…" className="form-input" style={{ fontFamily:'monospace', marginBottom:'1.5rem' }} />
+        <input type="password" value={key} onChange={setKey(e.target.value)} placeholder="AIzaSy…" className="form-input" style={{ fontFamily:'monospace', marginBottom:'1.5rem' }} />
         <div style={{ display:'flex', gap:'1rem', justifyContent:'flex-end' }}>
           <button onClick={onClose} className="secondary-action-btn">Fermer</button>
           <button onClick={save} className="primary-action-btn">Enregistrer les paramètres</button>
@@ -1813,12 +1813,27 @@ function StylesStructure() {
           max-width: 100%;
         }
         .user-profile-bar {
+          display: flex;
+          flex-direction: column;
+          align-items: stretch;
+          width: 100%;
+          gap: 0.6rem;
+        }
+        .user-profile-meta-row {
+          display: flex;
           justify-content: space-between;
+          align-items: center;
           width: 100%;
         }
         .user-profile-actions-row {
-          flex-grow: 1;
-          justify-content: flex-end;
+          display: flex;
+          gap: 0.6rem;
+          width: 100%;
+        }
+        .user-profile-actions-row button {
+          flex: 1;
+          text-align: center;
+          justify-content: center;
         }
         .add-recipe-btn, .logout-btn {
           padding: 0.6rem 1rem;
@@ -1826,6 +1841,13 @@ function StylesStructure() {
         }
         .tabs-container {
           padding: 0 1rem;
+          justify-content: space-between;
+        }
+        .tab-btn {
+          padding: 0.8rem 0.5rem;
+          font-size: 0.85rem;
+          flex: 1;
+          text-align: center;
         }
         .categories-inner-container {
           padding: 0.6rem 1rem;
@@ -1841,6 +1863,13 @@ function StylesStructure() {
           gap: 0.8rem;
           margin-bottom: 0.8rem;
         }
+        .form-ingredient-row {
+          flex-wrap: nowrap !important;
+        }
+        .form-ingredient-row .qty-input {
+          width: 75px !important;
+          flex-shrink: 0;
+        }
         .visibility-toggle-container {
           flex-direction: column;
           gap: 0.6rem;
@@ -1852,7 +1881,7 @@ function StylesStructure() {
           padding: 0.5rem;
         }
         .modal-box {
-          max-height: 95vh;
+          max-height: 93vh;
         }
         .form-actions-footer {
           flex-direction: column-reverse;
@@ -1875,11 +1904,12 @@ function StylesStructure() {
           position: relative !important;
           background: var(--bg-card) !important;
           color: var(--text-main) !important;
-          padding: 1rem !important;
+          padding: 1.2rem 1rem !important;
         }
         .detail-hero-overlay-content h1 {
           color: var(--text-main) !important;
           text-shadow: none !important;
+          font-size: 1.5rem !important;
         }
         .detail-meta-pill {
           background: var(--bg-nav) !important;
