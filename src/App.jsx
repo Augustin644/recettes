@@ -11,45 +11,46 @@ import {
 
 // ── DESIGN SYSTEM & THEMES CONFIGURATION ──────────────────────────────────────
 // Facile à modifier si tu veux changer l'identité visuelle de l'application !
+// ── DESIGN SYSTEM & THEMES CONFIGURATION (VERSION DÉLICATE & ACCORDÉE) ────────
 const THEMES = {
-  mine: { // Thème Clair Épuré (Inspiration Apple)
-    "--bg-main": "#F5F5F7",
-    "--bg-card": "#FFFFFF",
-    "--bg-header": "rgba(255, 255, 255, 0.8)",
-    "--bg-nav": "#E8E8ED",
-    "--text-main": "#1D1D1F",
-    "--text-muted": "#86868B",
-    "--accent": "#0071E3",
-    "--accent-light": "#E8F2FC",
-    "--border": "#E5E5EA",
-    "--shadow": "0 4px 20px rgba(0, 0, 0, 0.05)",
-    "--backdrop": "blur(20px) saturate(180%)",
+  mine: { // 📕 L'Atelier : Ambiance "Cuisine Créative" (Tons Naturels & Terre cuite)
+    "--bg-main": "#F9F8F6",          // Fond lin très doux, légèrement chaud
+    "--bg-card": "#FFFFFF",          // Blanc pur pour détacher les recettes
+    "--bg-header": "rgba(249, 248, 246, 0.85)",
+    "--bg-nav": "#F0EDE9",           // Gris-brun chaud très clair
+    "--text-main": "#2C2A29",        // Anthracite doux (presque un marron très foncé)
+    "--text-muted": "#8A8580",       // Taupe léger
+    "--accent": "#D96B43",           // Terre cuite / Cannelle chaleureux
+    "--accent-light": "#FDF3EE",     // Un voile de pêche pour les fonds légers
+    "--border": "#EAE5E0",           // Bordure fine couleur ficelle
+    "--shadow": "0 4px 24px rgba(44, 42, 41, 0.03)",
+    "--backdrop": "blur(20px)",
   },
-  public: { // Thème Sombre Feutré (Inspiration Lounge/Cinéma)
-    "--bg-main": "#0B0B0C",
-    "--bg-card": "#161617",
-    "--bg-header": "rgba(22, 22, 23, 0.8)",
-    "--bg-nav": "#232324",
-    "--text-main": "#F5F5F7",
-    "--text-muted": "#86868B",
-    "--accent": "#FF9F0A",
-    "--accent-light": "#2C1E0A",
-    "--border": "#2C2C2E",
-    "--shadow": "0 8px 30px rgba(0, 0, 0, 0.3)",
-    "--backdrop": "blur(20px) saturate(120%)",
-  },
-  favorites: { // Thème Douceur Romantique (Pour les Favoris)
-    "--bg-main": "#FAF6F6",
+  public: { // 🌐 Le Marché Public : Ambiance "Herbes Fraîches & Potager" (Sauge & Eucalyptus)
+    "--bg-main": "#F5F7F5",          // Un blanc teinté d'une pointe de vert sauge très pale
     "--bg-card": "#FFFFFF",
-    "--bg-header": "rgba(255, 255, 255, 0.8)",
-    "--bg-nav": "#F3EBEB",
-    "--text-main": "#2C1E1E",
-    "--text-muted": "#A28F8F",
-    "--accent": "#FF3B30",
-    "--accent-light": "#FDE8E8",
-    "--border": "#EFE1E1",
-    "--shadow": "0 4px 20px rgba(255, 59, 48, 0.05)",
-    "--backdrop": "blur(20px) saturate(180%)",
+    "--bg-header": "rgba(245, 247, 245, 0.85)",
+    "--bg-nav": "#E8EFE8",           // Vert d'eau très adouci
+    "--text-main": "#232A25",        // Vert forêt ultra-sombre, très élégant
+    "--text-muted": "#7A857D",       // Sauge grisée
+    "--accent": "#4A7C59",           // Vert herbe fraîche / Laurier
+    "--accent-light": "#EDF4EE",     // Fond vert givré
+    "--border": "#E1EAE2",
+    "--shadow": "0 4px 24px rgba(35, 42, 37, 0.03)",
+    "--backdrop": "blur(20px)",
+  },
+  favorites: { // ❤️ Les Favoris : Ambiance "Petits Plaisirs" (Baies de Goji & Figue blanche)
+    "--bg-main": "#F8F5F6",          // Blanc très légèrement rosé/poudré
+    "--bg-card": "#FFFFFF",
+    "--bg-header": "rgba(248, 245, 246, 0.85)",
+    "--bg-nav": "#F2E9EB",           // Pétale de rose séché très discret
+    "--text-main": "#342226",        // Prune / Figue noire
+    "--text-muted": "#8C7B7E",       // Rose poudré grisé
+    "--accent": "#C84B61",           // Framboise écrasée / Amarante
+    "--accent-light": "#FDF2F4",     // Voile de lait fraise
+    "--border": "#EAE0E2",
+    "--shadow": "0 4px 24px rgba(52, 34, 38, 0.03)",
+    "--backdrop": "blur(20px)",
   }
 };
 
