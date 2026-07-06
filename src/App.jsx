@@ -12,44 +12,45 @@ import {
 // ── DESIGN SYSTEM & THEMES CONFIGURATION ──────────────────────────────────────
 // Facile à modifier si tu veux changer l'identité visuelle de l'application !
 // ── DESIGN SYSTEM & THEMES CONFIGURATION (VERSION DÉLICATE & ACCORDÉE) ────────
+// ── DESIGN SYSTEM & THEMES CONFIGURATION (VERSION 25% CONTRASTE AFFIRMÉ) ──────
 const THEMES = {
-  mine: { // 📕 L'Atelier : Ambiance "Cuisine Créative" (Tons Naturels & Terre cuite)
-    "--bg-main": "#F9F8F6",          // Fond lin très doux, légèrement chaud
-    "--bg-card": "#FFFFFF",          // Blanc pur pour détacher les recettes
-    "--bg-header": "rgba(249, 248, 246, 0.85)",
-    "--bg-nav": "#F0EDE9",           // Gris-brun chaud très clair
-    "--text-main": "#2C2A29",        // Anthracite doux (presque un marron très foncé)
-    "--text-muted": "#8A8580",       // Taupe léger
-    "--accent": "#D96B43",           // Terre cuite / Cannelle chaleureux
-    "--accent-light": "#FDF3EE",     // Un voile de pêche pour les fonds légers
-    "--border": "#EAE5E0",           // Bordure fine couleur ficelle
-    "--shadow": "0 4px 24px rgba(44, 42, 41, 0.03)",
+  mine: { // 📕 L'Atelier : Ambiance "Cuisine Créative" (Tons Sable Chaud & Terre cuite)
+    "--bg-main": "#EFECE6",          // Un vrai grège/sable texturé et chaleureux
+    "--bg-card": "#FFFFFF",          // Blanc pur (Tranché net sur le fond sable)
+    "--bg-header": "rgba(239, 236, 230, 0.85)",
+    "--bg-nav": "#DFD9CE",           // Ombre sable plus marquée
+    "--text-main": "#1F1A17",        // Marron expresso presque noir (très lisible)
+    "--text-muted": "#6E655F",       // Écorce
+    "--accent": "#C85329",           // Terre cuite vibrante
+    "--accent-light": "#FBEBE3",     // Crème de pêche
+    "--border": "#D5CEBF",           // Ligne de structure bien visible
+    "--shadow": "0 6px 20px rgba(31, 26, 23, 0.06)",
     "--backdrop": "blur(20px)",
   },
-  public: { // 🌐 Le Marché Public : Ambiance "Herbes Fraîches & Potager" (Sauge & Eucalyptus)
-    "--bg-main": "#F5F7F5",          // Un blanc teinté d'une pointe de vert sauge très pale
-    "--bg-card": "#FFFFFF",
-    "--bg-header": "rgba(245, 247, 245, 0.85)",
-    "--bg-nav": "#E8EFE8",           // Vert d'eau très adouci
-    "--text-main": "#232A25",        // Vert forêt ultra-sombre, très élégant
-    "--text-muted": "#7A857D",       // Sauge grisée
-    "--accent": "#4A7C59",           // Vert herbe fraîche / Laurier
-    "--accent-light": "#EDF4EE",     // Fond vert givré
-    "--border": "#E1EAE2",
-    "--shadow": "0 4px 24px rgba(35, 42, 37, 0.03)",
+  public: { // 🌐 Le Marché Public : Ambiance "Herbes Fraîches" (Sauge Prononcée & Forêt)
+    "--bg-main": "#E3EAE4",          // Un vrai vert sauge adouci mais affirmé
+    "--bg-card": "#FFFFFF",          // Blanc pur éclatant
+    "--bg-header": "rgba(227, 234, 228, 0.85)",
+    "--bg-nav": "#CDDAD0",           // Sauge soutenue pour les boutons
+    "--text-main": "#0F1812",        // Vert bouteille profond (très haut contraste)
+    "--text-muted": "#526357",       // Feuille de laurier
+    "--accent": "#2E623E",           // Vert pin / Forêt noble
+    "--accent-light": "#E8F0EA",     // Rosée du matin
+    "--border": "#BDCFC1",           // Bordure végétale nette
+    "--shadow": "0 6px 20px rgba(15, 24, 18, 0.06)",
     "--backdrop": "blur(20px)",
   },
-  favorites: { // ❤️ Les Favoris : Ambiance "Petits Plaisirs" (Baies de Goji & Figue blanche)
-    "--bg-main": "#F8F5F6",          // Blanc très légèrement rosé/poudré
-    "--bg-card": "#FFFFFF",
-    "--bg-header": "rgba(248, 245, 246, 0.85)",
-    "--bg-nav": "#F2E9EB",           // Pétale de rose séché très discret
-    "--text-main": "#342226",        // Prune / Figue noire
-    "--text-muted": "#8C7B7E",       // Rose poudré grisé
-    "--accent": "#C84B61",           // Framboise écrasée / Amarante
-    "--accent-light": "#FDF2F4",     // Voile de lait fraise
-    "--border": "#EAE0E2",
-    "--shadow": "0 4px 24px rgba(52, 34, 38, 0.03)",
+  favorites: { // ❤️ Les Favoris : Ambiance "Gourmandise" (Vieux Rose & Baies Sauvages)
+    "--bg-main": "#EFE6E8",          // Un vrai fond vieux rose poudré et feutré
+    "--bg-card": "#FFFFFF",          // Blanc pur éclatant
+    "--bg-header": "rgba(239, 230, 232, 0.85)",
+    "--bg-nav": "#DFCCD0",           // Rose séché pour les boutons cliquables
+    "--text-main": "#261115",        // Cerise noire intense
+    "--text-muted": "#6B5357",       // Prune grisé
+    "--accent": "#B6324B",           // Framboise mûre assumée
+    "--accent-light": "#FAE8EB",     // Nuage de lait fraise
+    "--border": "#D5BFC3",           // Bordure baie sauvage
+    "--shadow": "0 6px 20px rgba(38, 17, 21, 0.06)",
     "--backdrop": "blur(20px)",
   }
 };
