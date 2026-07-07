@@ -482,7 +482,7 @@ function RecipeForm({ initial = {}, onClose, onSave, onNeedApiKey, title = "Nouv
           <button onClick={onClose} className="close-square-btn">✕</button>
         </div>
 
-        <AIPanel onResult={applyAIResult} onUsePhotoAsIllustration={setPhotoFile} onNeedApiKey={onNeedApiKey}
+        <AIPanel onResult={applyAIResult} onUsePhotoAsIllustration={setPhotoFile} onNeedApiKey={onNeedApiKey} />
 
         {/* Photo input */}
         <div style={{ marginBottom:'1.2rem' }}>
