@@ -1,0 +1,93 @@
+/* ── TOKENS · "Éditorial Ambré" ─────────────────────────────────────────────
+   Base crème chaude · surface blanche · encre quasi-noire · UN accent orangé.
+   Ratio type : 1.250 (major third) · Espace : base 4px · Radius unique 16px. */
+
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&display=swap');
+
+:root {
+  /* TYPE */
+  --font-display: 'Fraunces', Georgia, 'Times New Roman', serif;
+  --font-text: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', sans-serif;
+
+  --step--1: 0.8rem;
+  --step-0: 1rem;
+  --step-1: 1.25rem;
+  --step-2: 1.5625rem;
+  --step-3: 1.953rem;
+  --step-4: 2.441rem;
+  --step-5: 3.052rem;
+
+  /* SPACE */
+  --space-3xs: 0.25rem;
+  --space-2xs: 0.5rem;
+  --space-xs: 0.75rem;
+  --space-s: 1rem;
+  --space-m: 1.5rem;
+  --space-l: 2rem;
+  --space-xl: 3rem;
+  --space-2xl: 4.5rem;
+
+  /* COLOR — light */
+  --bg: #F7F6F2;
+  --surface: #FFFFFF;
+  --surface-2: #EFEDE7;
+  --ink: #1C1A17;
+  --ink-2: #5F5A51;
+  --ink-3: #9C968A;
+  --line: #E7E3DA;
+  --accent: #FF5A36;
+  --accent-strong: #E34A24;
+  --accent-ink: #B23D22;
+  --accent-soft: #FFEDE6;
+  --on-accent: #FFFFFF;
+  --danger: #E4362A;
+  --success: #23A566;
+  --info: #0A84FF;
+  --warn: #E8A33D;
+  --success-soft: #E4F4EC;
+  --info-soft: #E5F1FF;
+  --warn-soft: #FCF0DC;
+
+  /* FORM */
+  --radius: 16px;
+  --radius-pill: 999px;
+  --shadow-near: 0 2px 8px rgba(28, 26, 23, 0.08);
+  --shadow-far: 0 18px 48px rgba(28, 26, 23, 0.18);
+
+  /* MOTION */
+  --dur-fast: 140ms;
+  --dur: 260ms;
+  --dur-slow: 460ms;
+  --ease: cubic-bezier(0.2, 0, 0, 1);
+  --ease-pop: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* LAYOUT */
+  --header-h: 56px;
+  --nav-h: 84px;
+  --content-max: 1080px;
+  --feed-max: 500px;
+}
+
+:root[data-theme="dark"] {
+  --bg: #0E0D0B;
+  --surface: #1A1815;
+  --surface-2: #24211D;
+  --ink: #F5F3EF;
+  --ink-2: #A8A297;
+  --ink-3: #6E6860;
+  --line: #2B2823;
+  --accent: #FF6B48;
+  --accent-strong: #FF7D58;
+  --accent-ink: #FFB199;
+  --accent-soft: rgba(255, 90, 54, 0.16);
+  --on-accent: #FFFFFF;
+  --danger: #FF6961;
+  --success: #32D883;
+  --info: #409CFF;
+  --warn: #E8B25C;
+  --success-soft: rgba(50, 216, 131, 0.16);
+  --info-soft: rgba(64, 156, 255, 0.16);
+  --warn-soft: rgba(232, 178, 92, 0.16);
+  --shadow-near: 0 2px 8px rgba(0, 0, 0, 0.4);
+  --shadow-far: 0 18px 48px rgba(0, 0, 0, 0.55);
+}
